@@ -1,0 +1,57 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/vehicles/desert_stallion_65.glb" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/desert_prototype_environment.glb" id="2"]
+[ext_resource type="Script" path="res://scenes/visual/visual_prototype.gd" id="3"]
+[sub_resource type="ProceduralSkyMaterial" id="SkyMaterial_sunset"]
+sky_top_color = Color(0.055, 0.075, 0.13, 1)
+sky_horizon_color = Color(0.72, 0.28, 0.085, 1)
+ground_bottom_color = Color(0.07, 0.025, 0.018, 1)
+ground_horizon_color = Color(0.48, 0.15, 0.045, 1)
+sun_angle_max = 18.0
+sun_curve = 0.08
+[sub_resource type="Sky" id="Sky_sunset"]
+sky_material = SubResource("SkyMaterial_sunset")
+[sub_resource type="Environment" id="1"]
+background_mode = 2
+sky = SubResource("Sky_sunset")
+background_energy_multiplier = 0.72
+ambient_light_source = 3
+ambient_light_color = Color(0.42, 0.25, 0.18, 1)
+ambient_light_energy = 0.42
+reflected_light_source = 2
+fog_enabled = true
+fog_light_color = Color(0.55, 0.27, 0.16, 1)
+fog_light_energy = 0.55
+fog_density = 0.004
+fog_sky_affect = 0.7
+tonemap_mode = 2
+[node name="VisualPrototype" type="Node3D"]
+script = ExtResource("3")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("1")
+[node name="SunsetKey" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-24, -128, 0)
+light_color = Color(1, 0.70, 0.48, 1)
+light_energy = 1.18
+shadow_enabled = true
+directional_shadow_max_distance = 80.0
+[node name="WarmFill" type="OmniLight3D" parent="."]
+position = Vector3(4, 3.8, 5)
+light_color = Color(0.92, 0.72, 0.58, 1)
+light_energy = 2.2
+omni_range = 12.0
+shadow_enabled = true
+[node name="RearFill" type="OmniLight3D" parent="."]
+position = Vector3(-4, 3, -3)
+light_color = Color(0.42, 0.52, 0.68, 1)
+light_energy = 1.35
+omni_range = 10.0
+[node name="Environment" parent="." instance=ExtResource("2")]
+[node name="DesertStallion65" parent="." instance=ExtResource("1")]
+position = Vector3(0, 0.08, -1.1)
+rotation_degrees = Vector3(0, -18, 0)
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(6.8, 3.2, -7.8)
+current = true
+fov = 46.0

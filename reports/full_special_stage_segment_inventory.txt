@@ -1,0 +1,33 @@
+Desert Velocity G1-F Full Special Stage Segment Inventory
+source=HandcraftedStage.route + RoadManager.stage_layout
+coverage=segments 0-63 without gaps
+distance_reference=segment index * 52 m
+altitude_reference=cumulative RoadManager pitch integration
+checkpoint_reference=GameManager.stage_checkpoint_segments
+obstacle_reference=RoadManager._add_gameplay
+
+FIELDS: range | distance m | length m | direction/yaw end | curvature | altitude m | pitch | surface | checkpoint | obstacles | jumps | visual issue | lateral space | camera risk | checkpoint occlusion risk
+
+00-02 | 0-156 | 156 | N / 0.00 deg | straight | 0.00->0.00 | flat | ASPHALT | none | 0 | none | pilot start is readable but visually sparse beyond start arch | 8.5-42 m each side | low | none
+03-05 | 156-312 | 156 | N->NE / 10.60->31.80 deg | +0.185 each, sustained right | 0.00->1.25 | +0.008 | GRAVEL | none | 6 | none | outer turn needs landmark spacing and obstacle contrast | safe beyond 12 m; keep apex clear | medium outside wall | none
+06-09 | 312-520 | 208 | NE/N/NE / 22.63->31.80 deg | -0.160,-0.160,+0.160,+0.160 | 1.25->2.50 | +0.006 | GRAVEL | CP1@09 | 8 | none | approved S composition; protect CP1 and both obstacle lanes | safe beyond 13 m | medium at alternating walls | high at segment 9
+10-13 | 520-728 | 208 | NE / 31.80 deg | straight | 2.50->1.56, local crest 2.18 | -0.012,-0.012,+0.018,-0.012 | GRAVEL | none | 0 | DOSSO@12 | transition from pilot needs low silhouettes around landing sightline | wide, keep 15 m around jump | medium over dosso | none
+14-17 | 728-936 | 208 | NE->NW / 13.46->-41.54 deg | -0.320 each, hairpin | 1.56->4.06 | +0.012 | GRAVEL | none | 8 | none | highest curvature and spectator/obstacle density; negative space mandatory | outside 15 m only | high inside hairpin | none
+18-20 | 936-1092 | 156 | NW / -38.39->-32.09 deg | +0.055 | 4.06->7.49 | +0.022 | GRAVEL | CP2@19 | 0 | CRESTA@20 | steep climb and skyline checkpoint need low framing | wide, no tall asset within 16 m | high at crest | high at CP2 skyline
+21-22 | 1092-1196 | 104 | NW / -28.93->-25.78 deg | +0.055 | 7.49->6.03 | -0.014 | GRAVEL | none | 0 | none | crest exit needs distant landmark, not roadside clutter | wide | medium downhill | none
+23-28 | 1196-1508 | 312 | NW->N / -22.35->-5.16 deg | +0.060 long left | 6.03->1.66 | -0.014 | ASPHALT | none | 0 | none | long descent needs readable asphalt identity and progressive canyon release | 12 m clear, broad exterior space | medium/high outside bend | none
+29-33 | 1508-1768 | 260 | N / -5.16 deg | straight | 1.66->4.78->3.64 | 0,+0.030,+0.030,-0.022,0 | GRAVEL | CP3@29 | 0 | RAMPA@30 | checkpoint immediately before jump; horizon and landing must stay clear | minimum 16 m clear at 29-32 | high over ramp | high at CP3
+34-39 | 1768-2080 | 312 | N / +0.57<->-5.16 deg | alternating +/-0.100 | 3.64 constant | flat | GRAVEL | CP4@39 | 0 | none | repeated S requires alternating masses without rhythmic cloning | 13 m clear on alternating apexes | medium | high at CP4 exit
+40-47 | 2080-2496 | 416 | N->NW / -8.31->-30.37 deg | -0.055 long tightening right | 3.64->0.31 | -0.008 | ASPHALT | none | 0 | none | longest asphalt descent; avoid continuous wall and hidden sightline | outside 14 m, inner side sparse | high late curve | none
+48-49 | 2496-2600 | 104 | NW / -27.79->-25.21 deg | +0.045 | 0.31->0.73 | +0.004 | GRAVEL | CP5@49 | 0 | none | surface transition and checkpoint need strong contrast | 14 m clear | low/medium | high at CP5
+50-56 | 2600-2964 | 364 | NW->N / -22.63->-7.16 deg | +0.045 | 0.73->2.18 | +0.004 | GRAVEL | none | 0 | none | medium run risks visual repetition; suitable for dunes/wreck narrative | broad 12-35 m | low if props remain lateral | none
+57-63 | 2964-3328 | 364 | N / -7.16 deg | straight | 2.18 constant | flat | GRAVEL | CP6@59, finish@63 | 0 | none | final run needs escalating landmark rhythm without blocking finish | broad; preserve central vista | low | high at CP6 and finish
+
+surface_totals=ASPHALT 17, GRAVEL 47, SAND offroad all segments, DEEP_SAND far-offroad all segments
+checkpoint_totals=6 ordered triggers unchanged
+obstacle_totals=22 existing collision obstacles; no visual-expansion obstacle authorized
+jump_totals=3 existing profiled collision jumps
+critical_camera_ranges=14-20,23-32,40-47
+critical_checkpoint_ranges=8-9,18-20,28-30,38-39,48-49,58-59
+rockarch_candidate_range=50-54 only; requires runtime clearance and camera proof before use
+inventory_classification=PASS

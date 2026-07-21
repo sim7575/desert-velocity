@@ -1,0 +1,101 @@
+Premium Vertical Slice V2 motion review F1.2
+date=2026-07-19
+classification=AWAITING_MANUAL_MOTION_APPROVAL
+production_integrated=false
+
+Capture
+method=Godot 4.7.1 native Movie Maker (--write-movie), deterministic 60 FPS render
+video=res://captures/premium_vertical_slice_v2/premium_vertical_slice_v2_motion_review.avi
+container=AVI
+video_codec=MJPEG
+audio_stream=present
+resolution=1280x720
+frame_rate=60
+frame_count=2281
+duration=00:00:38:01
+file_size_bytes=125813832
+desktop_overlays=false
+cursor_visible=false
+motion_frames=res://screenshots/premium_vertical_slice_v2/motion_review/
+motion_frame_count=14
+
+Motion review
+start=PASS
+wide_curve=PASS
+overtake=PASS
+descent=PASS
+canyon=PASS
+obstacle_avoidance=PASS after local placement correction
+jump=PASS
+boost=PASS
+arch_approach=PASS
+arch_crossing=PASS
+final_exit=PASS
+
+Local correction
+The first complete capture demonstrated that the main MediumRock_02 instance crossed the chase-camera corridor at about 22.7 seconds and covered more than half of the image. The source mesh, route and camera were not changed. Only the three local obstacle instances were moved toward the right shoulder; the main instance scale changed from 1.25/1.18/1.25 to 1.00/0.96/1.00. Maximum measured single-mesh screen coverage is now 0.310. The obstacle remains readable and the car's authored left avoidance remains unchanged.
+
+Camera
+camera_position_max_step_m_per_60fps_frame=0.289
+camera_rotation_max_step_rad_per_60fps_frame=0.0031
+player_screen_bounds_px=508.0,357.2 to 617.7,435.2
+fov_before_boost_deg=70.49
+fov_peak_deg=73.79
+fov_after_boost_deg=70.98
+random_oscillation=false
+serious_clipping=false
+arch_camera_clearance=PASS
+
+Effects and HUD
+dust_emitters=2 rear-wheel local emitters
+dust_max_amount_step_per_frame=0.0079
+dust_curve_jump_boost_intensification=PASS
+dust_popping=false
+dust_vehicle_occlusion=false
+boost_warm_flames=PASS
+boost_large_blue_halo=false
+boost_overexposure=false
+boost_fov_progression=PASS
+hud_numbers_stable=PASS
+hud_progress_consistent=PASS
+hud_context_transitions=PASS
+hud_safe_area=PASS
+hud_truncation=false
+
+MX150 real-time metrics
+average_fps=59.97
+instantaneous_minimum_fps=30.50
+percentile_5_fps=60.00
+minimum_sustained_fps=57.99
+recurring_stutter=false
+peak_draw_calls=455
+peak_primitives=487433
+peak_nodes=357
+peak_static_memory_mb=44.08
+load_time_ms=855.87
+
+Validation
+git_diff_check=PASS
+parser_import=PASS
+boot_headless=PASS
+direct_scene_load=PASS
+road_seam_verification=PASS
+stallion_v2_integration_verification=PASS
+gt_v2_visual_verification=PASS
+gt_v2_gameplay_integration_verification=PASS
+runtime_verification=PASS
+stallion_v3_blockout_verification=PASS
+stallion_v3_asset_verification=PASS
+environment_kit_v2_blockout_verification=PASS
+environment_kit_v2_verification=PASS
+premium_vertical_slice_verification=PASS
+premium_vertical_slice_v2_verification=PASS
+premium_vertical_slice_v2_motion_verification=PASS
+
+Warnings
+movie_maker_teardown=4 ObjectDB instances leaked at exit
+interrupted_direct_load_teardown=6 ObjectDB instances leaked at exit
+complete_sequence_functional_errors=none
+
+Invariants
+Stallion V3, VehicleFactory, Environment Kit source assets, gameplay, physics, controller, production HUD, progression, saves, project.godot and production scenes are unchanged.

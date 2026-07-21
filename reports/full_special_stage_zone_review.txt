@@ -1,0 +1,70 @@
+Desert Velocity G1-F.1 Full Special Stage Zone Review
+date=2026-07-21
+checkpoint_initial=3073441e64b0c62269c68d605d48618e1d686520
+classification=PASS
+
+Scope
+- Visual composition only. Route, stage_layout, gameplay, physics, collisions, camera, Stallion V3, HUD, effects, logical checkpoints, saves and progression are unchanged.
+- Exact zone boundaries remain 0-9, 10-17, 18-28, 29-39, 40-47, 48-56 and 57-63.
+- Existing Environment Kit V2 meshes and approved G1-D.1 materials remain the source. Local zone materials are runtime duplicates with palette parameters only; source materials are unchanged.
+
+Zone 1 | Desert Start / Open Flats | 0-9
+- Dedicated collision-free PARTENZA gate replaces only the red endpoint visual.
+- Two light paddock shelters, lateral markers and a distant rocky anticipation cue establish the race start while preserving the open central axis.
+- Identity: light ochre, low controlled density and long sightline.
+
+Zone 2 | Eroded Rock Corridor | 10-17
+- Progressive left-dominant wall and broken right wall form an open corridor without roof or route intrusion.
+- Secondary rocks, talus/contact scatter and sparse vegetation ground the wall bases.
+- Identity: burnt earth and brown, increasing perceived enclosure with deliberate openings.
+
+Zone 3 | Canyon Approach | 18-28
+- Distant mesa announces the zone; asymmetric canyon fins then increase height and local contrast toward the ridge.
+- CP2 and the CP3 approach remain unobstructed; the sky remains continuously visible.
+- Identity: muted red rock with cooler shadow palette and layered depth.
+
+Zone 4 | High Plateau | 29-39
+- Distant and mid-distance mesas describe plateau edges without adding physical precipices.
+- Low broad rocks and a crest sign preserve the largest intentional negative space and horizon readability.
+- Identity: desaturated warm gray/beige panorama rather than an empty terrain plane.
+
+Zone 5 | Dunes and Wreck | 40-47
+- The approved survey rover is enlarged and grouped with a hazard sign, abstract debris and a partially overlapping dune outside the road corridor.
+- A secondary dune composition carries the transition toward gravel without turning the area into a scrapyard.
+- Identity: golden sand and subdued oxidized metal narrative cluster.
+
+Zone 6 | Technical Gravel Pass | 48-56
+- Unequal-height walls follow the gentle curve and create two open visual gates.
+- Direction signs, a safety barrier, edge debris and base scatter signal technical rhythm before steering input.
+- CP5, the road, jumps and sightlines remain clear.
+- Identity: darker brown/cool rock, closer safe lateral masses and asymmetric rhythm.
+
+Zone 7 | Final Golden Run | 57-63
+- Distant warm mesas begin the crescendo; two large asymmetric canyon fins at segment 61 create an open natural gate.
+- Lateral markers lead to a dedicated collision-free TRAGUARDO gate with warm-white and ochre accents.
+- The center remains clear and the finish is visible in advance.
+- Identity: warm ochre culmination and the strongest visual axis of the stage.
+
+RockArch decision
+- RockArch_A remains deferred. Its candidate area is close to CP5 and a curved section; forcing it would risk camera clearance and checkpoint readability.
+- The approved alternative is an open natural gate without a roof, built from asymmetric canyon fins. It introduces no collider and requires no route change.
+
+Density, LOD and visibility
+- Full composition: LOD0 4, LOD1 70, LOD2 646.
+- 28 MultiMesh groups aggregate 690 instances, down from the G1-F baseline of 710.
+- Small scatter was reduced and redistributed toward zones 2, 3, 5, 6 and 7; 64 contact instances ground key formations.
+- Fixed authored LOD and distance visibility retain margins of at least 18 m. A 320-frame moving pass found no grave popping or persistent transition slowdown.
+
+HUD 0 m investigation
+- With the normal two-segment look-ahead present, 0 m occurred once in 320 controlled motion samples: at the exact center of the final clamped pacenote target.
+- Maximum duration was one sample. It did not persist and is not a HUD state bug.
+- Repeated 0 m values in some automatic screenshots were caused by freezing/recycling the fixture at an exact segment center without its normal look-ahead. HUD logic was not modified.
+
+Performance and validation
+- MX150, GL Compatibility, 1280x720, 840 measured frames across seven zones.
+- Average 59.98 FPS; P5 58.94; minimum sustained 59.83; P95 16.967 ms; P99 17.189 ms; recurring stutter false.
+- Peak 500 draw calls, 249534 primitives, 1163 nodes, 66.15 MB static memory.
+- Cold load 15045.40 ms includes first-process shader/import warm-up; warm load 824.37 ms.
+- Parser/import, Boot, full controlled race, six checkpoints, finish, pause/resume/restart, surfaces, fallback chain, seam and 15 non-destructive regression suites PASS.
+- 24 real gameplay screenshots at 1280x720 are stored in screenshots/playable_visual_integration_pilot/g1f1/.
+- Video not produced; optional and no additional software was installed.

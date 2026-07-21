@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scenes/production_visual_pilot/environment/environment_v2_playable_scenario_pilot.gd" id="1_script"]
+
+[node name="EnvironmentV2PlayableScenarioPilot" type="Node3D"]
+script = ExtResource("1_script")

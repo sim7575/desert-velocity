@@ -1,0 +1,142 @@
+diff --git a/scenes/visual/asset_review/desert_stallion_v3_visual.gd b/scenes/visual/asset_review/desert_stallion_v3_visual.gd
+index b6cb8d9..545cda6 100644
+--- a/scenes/visual/asset_review/desert_stallion_v3_visual.gd
++++ b/scenes/visual/asset_review/desert_stallion_v3_visual.gd
+@@ -1,10 +1,10 @@
+ class_name DesertStallionV3Visual
+ extends Node3D
+ 
+-const LOD_SCENES := [
+-	preload("res://assets/models/vehicles/desert_stallion_v3.glb"),
+-	preload("res://assets/models/vehicles/desert_stallion_v3_lod1.glb"),
+-	preload("res://assets/models/vehicles/desert_stallion_v3_lod2.glb"),
++const LOD_PATHS := [
++	"res://assets/models/vehicles/desert_stallion_v3.glb",
++	"res://assets/models/vehicles/desert_stallion_v3_lod1.glb",
++	"res://assets/models/vehicles/desert_stallion_v3_lod2.glb",
+ ]
+ const TEXTURE_PATHS := {
+ 	"base_color": "res://assets/textures/vehicles/stallion_v3/stallion_v3_base_color.png",
+@@ -52,7 +52,10 @@ func _ready() -> void:
+ 			shared_textures[texture_name] = load(TEXTURE_PATHS[texture_name]) as Texture2D
+ 	textures = shared_textures
+ 	for level in _lod_levels_to_instantiate():
+-		var model := LOD_SCENES[level].instantiate() as Node3D
++		var packed := load(LOD_PATHS[level]) as PackedScene
++		if packed == null:
++			continue
++		var model := packed.instantiate() as Node3D
+ 		model.name = "LOD%d" % level
+ 		model.rotation.y = PI
+ 		add_child(model)
+diff --git a/scenes/visual/production/stallion_v3_playable_visual.gd b/scenes/visual/production/stallion_v3_playable_visual.gd
+index 46b48fa..ef3876d 100644
+--- a/scenes/visual/production/stallion_v3_playable_visual.gd
++++ b/scenes/visual/production/stallion_v3_playable_visual.gd
+@@ -8,10 +8,11 @@ const RUNTIME_WHEEL_CENTERS := {
+ 	"Wheel_RR": Vector3(0.88, 0.47, 1.41),
+ }
+ const MODEL_OFFSET := Vector3(0.0, 0.04, 0.0)
++const RUNTIME_SOURCE_LOD := 1
+ var runtime_visual_initialized := false
+ 
+ func _lod_levels_to_instantiate() -> Array[int]:
+-	return [0]
++	return [RUNTIME_SOURCE_LOD]
+ 
+ func _ready() -> void:
+ 	initialize_runtime_visual()
+@@ -26,10 +27,13 @@ func initialize_runtime_visual() -> void:
+ 	set_variant("rally_sand")
+ 	for model in lod_models:
+ 		model.position = MODEL_OFFSET
++		_merge_static_surfaces(model)
+ 	_align_runtime_wheel_pivots()
+ 	set_meta("stallion_v3_visual_pilot", true)
+ 	set_meta("stallion_v3_variant", "rally_sand")
+-	set_meta("visual_model_path", "res://assets/models/vehicles/desert_stallion_v3.glb")
++	set_meta("visual_model_path", LOD_PATHS[RUNTIME_SOURCE_LOD])
++	set_meta("runtime_source_lod", RUNTIME_SOURCE_LOD)
++	set_meta("runtime_static_surface_draws", 6)
+ 	set_meta("production_integrated", true)
+ 	set_meta("manual_lods", false)
+ 	# VehicleController's unchanged wheel-animation path recognizes this legacy
+@@ -37,6 +41,53 @@ func initialize_runtime_visual() -> void:
+ 	set_meta("blender_stallion_v2", true)
+ 	set_meta("wheel_animation_compatibility", "blender_v2_pivots")
+ 
++func _merge_static_surfaces(model: Node3D) -> void:
++	var tools: Dictionary = {}
++	var source_meshes: Array[MeshInstance3D] = []
++	for child in model.find_children("*", "MeshInstance3D", true, false):
++		var mesh_instance := child as MeshInstance3D
++		if _belongs_to_wheel(mesh_instance) or mesh_instance.mesh == null:
++			continue
++		source_meshes.append(mesh_instance)
++		var relative_transform := _transform_relative_to(mesh_instance, model)
++		for surface in mesh_instance.mesh.get_surface_count():
++			var category := _surface_category(mesh_instance.name, surface)
++			if not tools.has(category):
++				var surface_tool := SurfaceTool.new()
++				surface_tool.begin(Mesh.PRIMITIVE_TRIANGLES)
++				tools[category] = surface_tool
++			(tools[category] as SurfaceTool).append_from(mesh_instance.mesh, surface, relative_transform)
++	var merged_root := Node3D.new()
++	merged_root.name = "RuntimeMergedStatic"
++	model.add_child(merged_root)
++	for category in tools:
++		var merged := MeshInstance3D.new()
++		merged.name = "Merged_%s" % category
++		merged.mesh = (tools[category] as SurfaceTool).commit()
++		merged.material_override = _material_for(category, "rally_sand")
++		merged_root.add_child(merged)
++	for mesh_instance in source_meshes:
++		var parent := mesh_instance.get_parent()
++		parent.remove_child(mesh_instance)
++		mesh_instance.free()
++
++func _belongs_to_wheel(node: Node) -> bool:
++	var current := node.get_parent()
++	while current != null and current != self:
++		if bool(current.get_meta("vehicle_wheel", false)):
++			return true
++		current = current.get_parent()
++	return false
++
++func _transform_relative_to(node: Node3D, ancestor: Node3D) -> Transform3D:
++	var result := node.transform
++	var current := node.get_parent()
++	while current != null and current != ancestor:
++		if current is Node3D:
++			result = (current as Node3D).transform * result
++		current = current.get_parent()
++	return result
++
+ func _align_runtime_wheel_pivots() -> void:
+ 	for model in lod_models:
+ 		for wheel_name in RUNTIME_WHEEL_CENTERS:
+diff --git a/tests/stallion_v3_playable_visual_pilot_verification.gd b/tests/stallion_v3_playable_visual_pilot_verification.gd
+index 37edbb1..a517132 100644
+--- a/tests/stallion_v3_playable_visual_pilot_verification.gd
++++ b/tests/stallion_v3_playable_visual_pilot_verification.gd
+@@ -16,15 +16,17 @@ func _run() -> void:
+ 	await process_frame
+ 	_check(bool(visual.get_meta("stallion_v3_visual_pilot", false)), "factory did not instantiate the V3 pilot")
+ 	_check(str(visual.get_meta("stallion_v3_variant", "")) == "rally_sand", "runtime variant is not Rally Sand")
+-	_check(str(visual.get_meta("visual_model_path", "")) == "res://assets/models/vehicles/desert_stallion_v3.glb", "runtime LOD0 path changed")
+-	_check(visual is StallionV3PlayableVisual and visual.active_lod == 0, "runtime pilot is not using LOD0")
++	_check(str(visual.get_meta("visual_model_path", "")) == "res://assets/models/vehicles/desert_stallion_v3_lod1.glb", "runtime LOD1 path changed")
++	_check(visual is StallionV3PlayableVisual and int(visual.get_meta("runtime_source_lod", -1)) == 1, "runtime pilot is not using source LOD1")
+ 	_check(visual.scale.is_equal_approx(Vector3.ONE), "runtime scale is not 1:1")
+ 	_check(visual.position.is_equal_approx(Vector3.ZERO), "physics-independent wrapper root offset changed")
+ 	for model in visual.lod_models:
+ 		_check(model.position.is_equal_approx(StallionV3PlayableVisual.MODEL_OFFSET), "runtime model ground offset changed")
+ 	var mesh_count := visual.find_children("*", "MeshInstance3D", true, false).size()
+-	_check(mesh_count == 14, "production LOD0 hierarchy changed: %d meshes" % mesh_count)
++	_check(mesh_count == 10, "optimized production hierarchy changed: %d meshes" % mesh_count)
+ 	_check(visual.lod_models.size() == 1 and not bool(visual.get_meta("manual_lods", true)), "production wrapper loaded unused LODs")
++	_check(visual.find_child("RuntimeMergedStatic", true, false) != null, "static runtime surfaces were not merged")
++	_check(int(visual.get_meta("runtime_static_surface_draws", -1)) == 6, "static material draw budget changed")
+ 	for wheel_name in StallionV3PlayableVisual.RUNTIME_WHEEL_CENTERS:
+ 		var wheel := visual.lod_models[0].find_child(wheel_name, true, false) as Node3D
+ 		_check(wheel != null, "missing runtime wheel " + wheel_name)

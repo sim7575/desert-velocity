@@ -1,0 +1,67 @@
+Desert Velocity G1-H — Initial Baseline and Runtime Inventory
+Date: 2026-07-21
+Branch: master
+HEAD: a30ff57fdac74c29da7f703141552483211bcafe
+Required checkpoint: a30ff57fdac74c29da7f703141552483211bcafe
+Checkpoint exists: yes
+Checkpoint ancestor of HEAD: yes (HEAD equals checkpoint)
+Tracked modifications: none
+Staged files: none
+Pre-existing untracked files: 15 camera/recovery diagnostics, preserved and excluded
+git diff --check: pass (line-ending warning only)
+git fsck --full --no-dangling: pass
+
+Runtime inventory
+
+Endurance:
+- Main entry: scenes/main/Boot.tscn -> scripts/game_manager.gd.
+- Both modes instantiate the same RoadManager and VehicleController.
+- start_game() sets road.stage_mode only for STAGE.
+- RoadManager.setup() attaches the approved environment wrapper only when stage_mode is true.
+- Therefore Endurance falls through to legacy procedural segment visuals for both vehicles.
+- VehicleFactory does not select the environment; the defect is the stage_mode visual gate in RoadManager/GameManager.
+
+Audio:
+- One AudioManager instance is owned persistently by GameManager.
+- Players: Engine, Music and SFX.
+- Engine and Music are looped streams started once per game start.
+- update_engine() is called every gameplay frame.
+- On GRAVEL it calls _play_tone(145 Hz, 0.07 s) whenever SFX is not playing; when the short stream ends it is immediately retriggered.
+- The same pattern exists for offroad and drift tones.
+- This is a deterministic short-stream pulse train, not a duplicated engine, checkpoint loop or countdown node; it matches the reported continuous tick.
+
+Stage timer/countdown:
+- A four-second start countdown already exists and correctly blocks stage_time.
+- stage_time is an elapsed stopwatch and is displayed by HUD.update_rally().
+- No residual-time value, checkpoint time bonus, duplicate-prevention bonus state or zero-time outcome exists.
+- The repair must preserve stage_time for result/penalty compatibility and add one authoritative residual timer, not replace unrelated scoring state.
+
+Landing:
+- VehicleController already tracks airborne, air_time and jump_landed.
+- GameplayVisualEffectsPilot already listens to jump_landed for the one-shot dust/fragment burst.
+- The vehicle visual is a child separated from the CharacterBody3D collider and already receives minor pitch/roll/deep-sand offsets.
+- There is no landing compression/rebound state.
+- The safe strategy is one visual-only response cycle on the existing visual root; collider, center of mass, velocity, gravity, camera and general handling remain unchanged.
+
+How to play/input:
+- Configured driving inputs: WASD/arrows, Space handbrake, Esc pause, R reposition, C camera, F3 telemetry, F4 atmosphere.
+- There is no turbo key. Turbo is activated by collecting the blue bonus; no key may be invented.
+
+Planned files (minimum scope):
+- scripts/game_manager.gd
+- scripts/road_manager.gd
+- scripts/audio_manager.gd
+- scripts/hud.gd
+- scripts/vehicle_controller.gd
+- one Endurance G1-F.1 visual adapter scene/script
+- tests/final_gameplay_consistency_repair_verification.gd
+- reports/final_gameplay_consistency_repair_report.txt
+- PROGRESS.md
+- screenshots/playable_visual_integration_pilot/g1h/*.png
+
+Protected/excluded:
+- gameplay scoring, multiplier, fuel, integrity and Endurance spawn rules
+- vehicle meshes/materials/LOD, chase camera, checkpoint indices/logic and G1-G route
+- save schema and progression
+- all pre-existing playable_camera_v3/recovery diagnostics and orphan recovery UIDs
+- personal/fiscal files, imports, exports, ZIP and release artifacts

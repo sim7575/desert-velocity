@@ -1,0 +1,23 @@
+Premium vertical slice structure metrics
+mode=complete_sequence
+duration_seconds=36.00
+path_length_m=535.84
+wide_curve_degrees=64.16
+elevation_drop_m=15.44
+bump_prominence_m=1.40
+continuity_max_gap_m=1.035
+average_fps=60.00
+minimum_fps=58.82
+low_5_percentile_fps=60.00
+peak_draw_calls=351
+peak_primitives=421920
+peak_nodes=123
+camera_max_frame_step_m=1.547
+camera_previous_distance_m=5.80
+camera_distance_m=4.65
+camera_previous_height_m=2.25
+camera_height_m=1.78
+camera_previous_fov=62.00
+camera_base_fov=62.50
+camera_lateral_offset_m=0.48
+camera_look_ahead_m=13.00

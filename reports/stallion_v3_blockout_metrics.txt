@@ -1,0 +1,16 @@
+Desert Stallion V3 blockout revision metrics
+duration_seconds=12.00
+average_fps=59.99
+minimum_fps=56.39
+peak_draw_calls=72
+peak_primitives=58060
+peak_nodes=57
+triangles=21968
+mesh_objects=13
+materials=7
+length_m=4.900
+width_m=2.206
+height_m=1.742
+wheelbase_m=2.940
+wheel_diameter_m=0.860
+tire_width_m=0.320

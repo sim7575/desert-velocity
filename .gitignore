@@ -1,0 +1,7 @@
+.godot/
+*.blend1
+assets/models/**/*.glb.import
+source_art/**/*.blend.import
+screenshots/**/*.png.import
+assets/textures/**/*.png.import
+assets/models/vehicles/*_stallion_v2_*.png*

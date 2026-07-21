@@ -1,0 +1,66 @@
+Desert Velocity G1-F Full Special Stage Visual Expansion Baseline
+date=2026-07-21
+head=fc93278e15789938b5922285b86b8d4f673f06f1
+branch=master
+git_tracked_changes_at_start=none
+git_integrity=PASS
+git_fsck_full_no_dangling=PASS
+approved_ancestors=ed9592fc5489fbeaf72aad6a2a839a264a73bc55,dbea31ff29a2b00394884c5b6a0ad34eb980953c,fd2719e97fdde330c1d8a0a79f24c5f93e5af2ff,971a05f5d391d4436676622336dbd7dacb61201e
+
+declared_stage_length=about 3.3 km (README exact reference 3328 m)
+effective_geometric_length_m=3328
+segment_count=64
+segment_length_m=52
+road_width_m=17
+checkpoint_count=6
+checkpoint_segments=9,19,29,39,49,59
+finish_segment=63
+logical_route_surfaces=ASPHALT,GRAVEL
+offroad_surfaces=SAND,DEEP_SAND
+asphalt_segments=17 (0-2,23-28,40-47)
+gravel_segments=47 (3-22,29-39,48-63)
+sand_sections=continuous offroad band outside logical road on all 64 segments
+deep_sand_sections=continuous far-offroad band beyond soft world limit on all 64 segments
+deterministic_obstacles=22 (two on each segment with abs(curve)>0.12: 3-9 and 14-17)
+collectible_schedule=segment index modulo 8 equals 4
+jump_count=3
+jumps=12:DOSSO,20:CRESTA,30:RAMPA
+principal_curves=3-5 right,6-9 S,14-17 hairpin,18-28 long recovery/left arc,34-39 technical S,40-47 long tightening right,48-56 medium left recovery
+altitude_min_m=0.00
+altitude_max_m=7.49
+elevation_range_m=7.49
+principal_climbs=3-9,12,14-20,30-31,48-56
+principal_descents=10-11,13,21-28,32,40-47
+
+g1e1_average_fps=60.43
+g1e1_p5_fps=57.56
+g1e1_minimum_sustained_fps=58.97
+g1e1_frame_time_p95_ms=17.374
+g1e1_frame_time_p99_ms=18.378
+g1e1_peak_draw_calls=757
+g1e1_peak_primitives=184774
+g1e1_peak_nodes=997
+g1e1_peak_static_memory_mb=60.01
+g1e1_warm_load_ms=1240.28
+g1e1_recurring_stutter=false
+
+preserved_untracked_count=15
+preserved_untracked=reports/playable_camera_v3_runtime_optimization_metrics.txt
+preserved_untracked=reports/recovery/playable_camera_v3_partial_diff.patch
+preserved_untracked=reports/recovery/playable_camera_v3_untracked_inventory.txt
+preserved_untracked=reports/recovery/stallion_v3_runtime_partial_diff.patch
+preserved_untracked=screenshots/playable_camera_v3_optimization/camera_after_curve.png
+preserved_untracked=screenshots/playable_camera_v3_optimization/camera_after_high_speed.png
+preserved_untracked=screenshots/playable_camera_v3_optimization/camera_after_straight.png
+preserved_untracked=screenshots/playable_camera_v3_optimization/camera_before.png
+preserved_untracked=screenshots/playable_camera_v3_optimization/camera_variant_farther.png
+preserved_untracked=screenshots/playable_camera_v3_optimization/camera_variant_lower.png
+preserved_untracked=screenshots/playable_camera_v3_optimization/lod0_lod1_runtime_comparison.png
+preserved_untracked=screenshots/playable_camera_v3_optimization/vehicle_screen_occupancy_measurement.png
+preserved_untracked=tests/playable_camera_v3_baseline_capture.gd.uid
+preserved_untracked=tests/playable_camera_v3_optimization_runtime_verification.gd
+preserved_untracked=tests/playable_camera_v3_optimization_runtime_verification.gd.uid
+
+route_modified=false
+gameplay_modified=false
+classification=PASS

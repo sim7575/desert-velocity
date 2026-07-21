@@ -1,0 +1,154 @@
+Desert Velocity G1-G — Garage, Scenario Parity and Route Dynamics Repair
+Date: 2026-07-21
+Initial checkpoint: 688906cc3d54bbaf13c76ec931e76ee948263745
+Runtime: Godot 4.7.1, GL Compatibility, 1280x720, NVIDIA GeForce MX150
+
+TECHNICAL CLASSIFICATION: PASS
+MANUAL CLASSIFICATION: AWAITING MANUAL GAMEPLAY ROUTE APPROVAL
+
+1. Garage
+
+Cause:
+- The old camera called look_at() before entering the SceneTree. Godot 4.7 rejected the call, so the camera could retain an invalid/default orientation.
+- The full-viewport preview had no dedicated screen region and was composed behind a 445 px overlay panel and its buttons.
+
+Repair:
+- Added a named, controlled GaragePreviewCamera, inserted into the SceneTree before look_at().
+- Reorganized the left panel to 390 px (30.5% of 1280 px) and declared an 818 px right preview safe area.
+- Camera framing is independent from the approved gameplay chase camera.
+- Measured visible vehicle bounds: Stallion x=654.83..953.36, y=262.57..455.48; Bavarian x=628.60..961.40, y=286.89..469.78.
+- All statistics, vehicle models/materials and keyboard/mouse navigation remain unchanged.
+
+2. Vehicle/scenario parity
+
+Cause:
+- VehicleFactory did not select a scenario; it only selected the vehicle visual/statistics. The normal Stage launch, however, relied on mutable global fallback flags and did not bind a canonical scenario path at the GameManager boundary.
+
+Repair:
+- RoadManager now accepts an instance-level stage_visual_profile_path.
+- GameManager explicitly requests FullSpecialStageVisualExpansion.tscn for the normal Stage path, independently of save.vehicle.
+- Disabled global flags still expose the old original and Environment V2 pilot as explicit technical fallbacks; they are never selected from the vehicle index.
+
+Runtime proof:
+- Desert Stallion 65 scenario_id=G1-F.1_FULL_STAGE.
+- Bavarian GT-R scenario_id=G1-F.1_FULL_STAGE.
+- Both vehicles traversed checkpoints [1,2,3,4,5,6] and reached GAME_OVER/finish.
+- Pause, resume, Stage restart, return to menu and persisted Bavarian selection passed.
+- Original scenario fallback, Environment V2 pilot fallback and Stallion V2 fallback passed when explicitly requested.
+
+3. Route dynamics
+
+Invariants:
+- 64 segments x 52 m = 3328 m.
+- Road half-width, surfaces (17 ASPHALT / 47 GRAVEL), checkpoint indices 9/19/29/39/49/59, checkpoint logic and finish logic unchanged.
+- No decorative collider added to the carriageway; profiled road meshes and concave drive collisions share the same vertices and return to local height 0 at both segment ends.
+
+Previous layout summary:
+- 3-5 +0.185; 6-9 -0.160/+0.160; 14-17 -0.320; 18-22 +0.055; 23-28 +0.060; 29-33 straight; 34-39 alternating +/-0.100 each segment; 40-47 -0.055; 48-56 +0.045; 57-63 straight.
+- Jumps: 12 DOSSO, 20 CRESTA, 30 RAMPA. CRESTA/RAMPA profiles did not produce measurable take-off in the controlled CharacterBody3D test (air_time=0 before repair).
+
+Final layout summary:
+- 3-5 right arc +0.130; 6-9 linked left/right S -0.140/+0.140.
+- 14-17 marked left hairpin -0.200.
+- 18-22 right climbing arc +0.090/+0.060 with crest.
+- 23-28 linked asphalt left/right -0.120/+0.100.
+- 29-33 ramp approach +0.040.
+- 34-39 technical right/left/right +0.130/-0.160/+0.130.
+- 40-47 linked asphalt left/right -0.110/+0.090.
+- 48-56 linked gravel right/left/right +0.120/-0.140/+0.100.
+- 57-58 final left -0.110; 59-60 crest approach/jump; 61-63 finish run.
+- Elevation range from logical segment pitch: -2.50 m to +3.95 m (6.45 m), with additional local jump profiles.
+- Deterministic marked-curve obstacle inventory: 40; route continuity regression passed 144 physical seam crossings.
+
+Final jumps:
+- Segment 12 DOSSO: minor smooth bump retained.
+- Segment 20 CRESTA: real geometric lip/landing profile.
+- Segment 30 RAMPA: real geometric lip/landing profile.
+- Segment 60 CRESTA: second final-run geometric jump.
+- Stallion at 96 km/h on segment 30: 16 observed airborne frames, air_time=0.4167 s, landed=true, damage_level=0.
+- Bavarian at 112 km/h on segment 60: 21 observed airborne frames, air_time=0.5000 s, landed=true, damage_level=0.
+- No gravity, suspension, handling, damage threshold or artificial jump impulse changed.
+
+4. Performance
+
+Cold/warm load sample:
+- cold_load_ms=1390.56; warm_load_ms=591.05.
+- The first cold performance pass had a one-zone shader warm-up warning while aggregate gates passed.
+
+Final warm MX150 sample (840 frames / seven zones):
+- average_fps=59.99
+- p5_fps=58.44
+- minimum_sustained_fps=58.99
+- frame_time_p95_ms=17.111
+- frame_time_p99_ms=18.052
+- recurring_stutter=false
+- peak_draw_calls=436
+- peak_primitives=250728
+- peak_nodes=1168
+- peak_static_memory_mb=65.28
+
+5. Validation
+
+PASS:
+- Parser/import and real Boot.
+- Real Garage at 1280x720 for both vehicles, measured screen-space bounds and visual inspection.
+- Same G1-F.1 identifier for both vehicles.
+- Full controlled race, CP1-6 and finish with both vehicles.
+- Real geometric medium/high-speed jump, airborne state and landing with both vehicles.
+- Pause/resume, restart, menu, selection persistence.
+- Explicit original scenario, Environment V2 pilot and Stallion V2 fallbacks.
+- Full-stage inventory, road seam verification, GT V2 integration, gameplay resources, save isolation and general runtime verification.
+- git diff --check.
+
+Warnings/limits:
+- Final route feel, jump comfort and artistic composition still require manual gameplay approval.
+- The cold run includes shader/resource warm-up; the separate warm run is the performance gate.
+- No chase-camera, HUD V2, vehicle mesh/material/LOD, handling, scoring, fuel, integrity, turbo, checkpoint logic, save schema, Endurance or full-stage environment-art changes were made.
+
+6. Files
+
+Modified/added for G1-G:
+- data/handcrafted_stage.gd
+- scripts/game_manager.gd
+- scripts/road_manager.gd
+- tests/full_special_stage_visual_expansion_verification.gd
+- tests/garage_scenario_route_dynamics_verification.gd and its valid script UID
+- reports/garage_scenario_route_dynamics_repair_report.txt
+- PROGRESS.md
+- screenshots/playable_visual_integration_pilot/g1g/ (20 PNG files)
+
+Explicitly excluded:
+- reports/playable_camera_v3_runtime_optimization_metrics.txt
+- reports/recovery/playable_camera_v3_partial_diff.patch
+- reports/recovery/playable_camera_v3_untracked_inventory.txt
+- reports/recovery/stallion_v3_runtime_partial_diff.patch
+- screenshots/playable_camera_v3_optimization/*
+- tests/playable_camera_v3_baseline_capture.gd.uid
+- tests/playable_camera_v3_optimization_runtime_verification.gd and .uid
+- .godot/import/cache output and isolated APPDATA test storage
+- personal files and F24 files
+
+7. Required screenshots
+
+01_garage_stallion_fixed.png
+02_garage_bavarian_fixed.png
+03_garage_before_after.png
+04_stallion_new_scenario_start.png
+05_bavarian_new_scenario_start.png
+06_same_scenario_vehicle_comparison.png
+07_curve_esse_entry.png
+08_curve_esse_mid.png
+09_long_curve_climb.png
+10_first_jump_takeoff.png
+11_first_jump_airborne.png
+12_first_jump_landing.png
+13_technical_sector_entry.png
+14_technical_sector_mid.png
+15_second_jump_or_crest.png
+16_final_curve.png
+17_finish_stallion.png
+18_finish_bavarian.png
+19_route_overview_before_after.png
+20_gameplay_hero_final.png
+
+Screenshot validation: 20/20 files, all 1280x720, all captured from the real Boot/gameplay flow.

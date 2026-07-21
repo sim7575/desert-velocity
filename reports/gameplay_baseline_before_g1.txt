@@ -1,0 +1,173 @@
+DESERT VELOCITY — GAMEPLAY BASELINE BEFORE G1
+Date: 2026-07-20
+Starting checkpoint supplied: b2068f5319ba2ab1a9a3165c4d61239e32b6cd5d
+Metrics reconciliation checkpoint: c76520f516e7903bd8782572c870056107d1d108
+Branch: master
+Classification: FAIL — G1 visual integration blocked before production changes
+
+Scope and method
+- Read-only analysis of the production flow, gameplay scripts, data and existing tests.
+- Godot 4.7.1, GL Compatibility, NVIDIA GeForce MX150, 1280x720.
+- Parser/import PASS; headless project boot PASS; visible Boot.tscn render PASS.
+- Existing regression suite executed without capture/metrics regeneration: all tests PASS.
+- Real Boot screenshot: res://screenshots/playable_visual_integration_pilot/01_boot_original_baseline.png.
+- No production scene, gameplay script, asset, project setting, save schema or approved source asset was changed.
+
+1. Main scene
+project.godot run/main_scene is res://scenes/main/Boot.tscn. Boot is a Node named DesertVelocity whose only attached production script is res://scripts/game_manager.gd.
+
+2. Boot -> game flow
+Boot instantiates GameManager. _ready() creates missing runtime input actions, loads SaveManager data, creates AudioManager and opens the main menu. PROVA SPECIALE or ENDURANCE selects run_mode and opens the garage. CONFERMA E PARTI calls start_game(), which saves current settings, clears the previous scene, builds the Environment and sun, creates VehicleController, RoadManager, CameraController and GameHUD, connects gameplay signals, resets run state and starts either immediately (ENDURANCE) or after a four-second countdown (STAGE).
+
+3. Race objective
+ENDURANCE: continue until fuel or integrity reaches zero, collecting bonuses and attempting to beat the saved score record. STAGE: traverse the effective 64x52 m route (about 3,328 m), pass six ordered geometric checkpoints and reach route index 63; official time is driving time plus penalties. The former 3,200 m wording was obsolete documentation, not gameplay geometry.
+
+4. Controls
+W/Up accelerate; S/Down brake then reverse; A/D or Left/Right steer; Space handbrake; C cycles four camera views; Esc pauses/resumes; R returns to a safe route transform; F3 toggles telemetry; F4 cycles atmosphere. Enter confirms focused menu buttons. While paused, R restarts and M returns to menu.
+
+5. Acceleration
+Throttle is Input.get_axis("brake", "accelerate") and is smoothed at 2.3 units/s for the 1420 kg Stallion or 3.2 units/s for the lighter GT. Base acceleration comes from VehicleData, then surface acceleration, damage_level and turbo multipliers are applied. Off-road and soft-boundary multipliers further reduce acceleration. Existing runtime tests prove both vehicles accelerate above 15 m/s, but do not freeze exact acceleration curves or times.
+
+6. Braking
+Negative throttle while moving forward approaches zero using vehicle brake multiplied by surface brake. Space applies an additional approach-to-zero rate of 18 m/s² and reduces target lateral grip through handbrake_blend. Exact stopping distances are not protected by an automated assertion.
+
+7. Steering
+Steering uses speed-dependent authority and a speed-reduced steer limit, modified by air state, damage and off-road state. Road alignment assistance applies only on-road with near-zero steering input above 2 m/s. Lateral velocity is grip-damped and clamped by max_slip. Runtime tests protect slip cap and physical off-road recovery, not exact steering response across the full speed range.
+
+8. Reverse
+When brake remains pressed below 1 m/s, speed approaches -28% of the current maximum using 65% of acceleration. Direction sign reverses steering. Runtime tests explicitly verify reverse speed below -2 m/s for both vehicles.
+
+9. Gearbox and gears
+There is no drivetrain or player-controlled shifting. simulated_gear is a six-step display value derived from speed/max_speed: clamp(int(ratio*5)+1, 1, 6). No existing test protects this mapping.
+
+10. Turbo/boost
+Turbo is granted by collectible kind 3 and activate_turbo() sets turbo_time to 5.0 seconds. While active, maximum speed is multiplied by 1.35 and acceleration by 1.22. Camera target FOV changes from 70 to 79 and the HUD bar displays turbo_time*20. No test protects duration, multipliers, consumption/countdown, HUD mapping or activation through the collectible signal.
+
+11. Fuel
+Fuel starts at 100. Drain per frame is 0.72*delta*(0.3+abs(speed)/40). Fuel collectible kind 0 adds 25 up to 100. Fuel <= 0 triggers generic game over in both modes. No automated test protects start value, drain formula, pickup or loss condition.
+
+12. Integrity
+Integrity starts at 100. Obstacle collisions emit metadata damage (10+2*kind); sustained off-road use starts damaging after 3 seconds at 3 integrity/s; reset removes 8 but clamps at 1. Landing impacts change VehicleController.damage_level rather than GameManager health. Health <= 0 triggers generic game over. No automated test protects these values or their HUD/result effects.
+
+13. Score
+Driving attempts to add int(abs(speed)*delta*multiplier*0.8) every frame; score collectible kind 1 adds 500*multiplier; reset removes 250 down to zero. This is ambiguous/contradictory: converting each frame contribution to int makes driving score frame-rate dependent and normally zero at 60 FPS for non-turbo maximum speed. No automated test protects scoring.
+
+14. Record
+Only show_game_over() compares ENDURANCE/generic score with save.record and persists a new record. Stage completion has no saved best-time record. No automated test protects record update, non-update, display or persistence.
+
+15. Multiplier
+Collectible kind 4 sets multiplier=2 for 10 seconds; expiry restores 1. It affects score additions. No automated test protects activation, duration, expiry or score interaction.
+
+16. Checkpoints
+STAGE uses ordered target route indices [9,19,29,39,49,59]. A checkpoint advances only when the nearest active segment has reached the current target and the player is within the logical road width/segment extent. runtime_verification protects countdown and one geometric checkpoint advance; it does not drive through or independently validate all six.
+
+17. Finish
+STAGE finishes when checkpoint count is at least six and nearest route index is at least 63. runtime_verification directly protects transition to the results screen after these conditions are arranged.
+
+18. Timer
+stage_time advances only after countdown while GAME is active and unpaused. Official result is stage_time+stage_penalty. No automated test protects timer rate, pause exclusion or result formatting.
+
+19. Penalties
+Accelerating during countdown adds 0.5 seconds per real second; off-road beyond three seconds adds 0.35 seconds per real second; collision damage >=14 adds 2 seconds; any manual/automatic reposition in STAGE adds 5 seconds. No automated test protects these calculations.
+
+20. Off-road behavior
+Road state is logical distance from the nearest segment center. Outside 8.5 m is off-road; beyond 22 m is DEEP_SAND/soft boundary; at 42 m the vehicle is reset. Off-road reduces max speed and acceleration, changes grip, adds recovery traction and eventually damages health. Runtime tests protect deep-sand detection, re-entry, retained lateral speed and hard-limit reset.
+
+21. Surfaces
+ASPHALT, GRAVEL, SAND and DEEP_SAND provide independent longitudinal grip, lateral grip, acceleration, brake, drag and roughness data. Stage segments preserve authored ASPHALT/GRAVEL metadata; off-road maps to SAND/DEEP_SAND. runtime_verification protects asphalt+gravel presence and deep-sand detection, but not every coefficient or their exact vehicle effect.
+
+22. Collisions
+VehicleController remains CharacterBody3D with a 2.5x1.25x4.7 m BoxShape3D, layer 2, mask 1|4. Road uses a continuous top-only ConcavePolygonShape3D; jump segments replace the flat surface with matched profile mesh/collision. Obstacles are StaticBody3D members of group obstacle. Stallion V2/GT integration tests protect simplified collision dimensions; road_seam_verification protects 144 seam crossings.
+
+23. Obstacles
+ENDURANCE randomly spawns one of six obstacle types; STAGE deterministically adds shoulder obstacles on sufficiently sharp route segments. Collision cuts speed to 38%, applies metadata damage and grants 1.1 seconds of collision invulnerability. Existing tests prove spawn transformation follows curves and seam crossings after test obstacle removal; obstacle damage/penalty logic is not protected.
+
+24. Victory conditions
+STAGE victory/result requires six checkpoints plus route index >=63. ENDURANCE has no victory condition. Stage finish transition is protected by runtime_verification.
+
+25. Defeat conditions
+Fuel <=0 or health <=0 calls generic show_game_over(). There is no other explicit defeat state. These conditions are not protected by automated tests.
+
+26. Saves
+user://desert_velocity.cfg stores record, vehicle, legacy volume, music volume, SFX volume, mute and graphics quality through ConfigFile. It does not store active race state, stage time, checkpoint progress or vehicle unlocks. No existing test protects defaults, round-trip persistence, schema compatibility or corrupt-file handling.
+
+27. Progression
+Current progression is limited to saved vehicle selection and score record; both vehicles are always selectable and no unlock/campaign progression exists. The requested invariant named "progression" is therefore not backed by a distinct implemented progression system or test.
+
+28. Test protection map and executed results
+- tests/runtime_verification.gd — PASS: both vehicles accelerate, slip cap, handbrake path, off-road recovery, reverse, hard reset, curves, transformed spawns, audio, asphalt/gravel/deep sand, route profile, countdown, one checkpoint, finish.
+- tests/road_seam_verification.gd — PASS: eight joints, three lanes, three speeds, two vehicle probes; 144 crossings.
+- tests/stallion_v2_integration_verification.gd — PASS: Stallion V2 factory path, wrapper, wheel pivots, simplified collision, wheel animation, cameras and procedural fallback.
+- tests/gt_v2_visual_verification.gd — PASS.
+- tests/gt_v2_gameplay_integration_verification.gd — PASS: GT stats, factory path, collision, wheel animation, cameras, garage, both modes and fallback.
+- tests/stallion_v3_blockout_verification.gd — PASS.
+- tests/stallion_v3_asset_verification.gd — PASS: V3 LOD, scale, wheel pivots, materials/textures and isolated status.
+- tests/environment_kit_v2_blockout_verification.gd — PASS.
+- tests/environment_kit_v2_verification.gd — PASS: approved assets, LOD, shared materials, MultiMesh and isolated status.
+- tests/premium_vertical_slice_verification.gd — PASS.
+- tests/premium_vertical_slice_v2_verification.gd — PASS.
+- tests/premium_vertical_slice_v2_motion_verification.gd — PASS: camera 0.289 m/frame, dust 0.0079/frame, obstacle coverage 0.310 and FOV progression.
+- Parser/import — PASS; Boot headless — PASS; visible Boot render — PASS.
+- Missing direct protection: exact input bindings; braking distance; exact steering/acceleration curves; fuel; integrity/damage; score; record; multiplier; turbo rules; all six checkpoints as a sequence; timer; penalties; generic defeat; save round trip; HUD values/messages/safe area in production; pause/restart; collectible effects; production performance metrics.
+
+29. Ambiguous, contradictory or unprotected rules — STOP CONDITIONS
+A. Driving score is frame-rate dependent because each frame is truncated to int before accumulation. At 60 FPS the normal Stallion maximum contributes less than one point per frame and therefore normally adds zero. Intended scoring cannot be inferred safely.
+B. GameManager declares STAGE_LENGTH=3200 and README says 3,200 m, but HandcraftedStage contains 64 segments at 52 m each (~3,328 m) and finish is route-index based. STAGE_LENGTH and CHECKPOINT_DISTANCE are unused.
+C. Landing impact increases VehicleController.damage_level but does not directly reduce GameManager health; intended relationship between landing damage and displayed integrity is not specified.
+D. Gears/RPM are display-only simulation, not transmission logic; no test defines their intended mapping.
+E. There is no distinct progression system despite progression being named as an invariant.
+F. Production gameplay performance (average FPS, sustained minimum, P5, draw calls, primitives, nodes, memory and load time) has no current automated baseline report. Existing MX150 metrics belong to isolated review/vertical-slice scenes and cannot be substituted for Boot gameplay.
+G. The production HUD has no dedicated automated test for all required values, truncation, safe area, signals or messages.
+
+30. Production files that must not be modified at this gate
+- project.godot
+- scenes/main/Boot.tscn
+- scripts/game_manager.gd
+- scripts/vehicle_controller.gd
+- scripts/road_manager.gd
+- scripts/vehicle_factory.gd
+- scripts/hud.gd
+- scripts/save_manager.gd
+- scripts/camera_controller.gd
+- data/balance_data.gd
+- data/vehicle_data.gd
+- data/handcrafted_stage.gd
+- all production scenes, gameplay collision resources, saves/progression files and approved V3/Environment Kit source assets
+
+G1-A decision
+Technical execution baseline: PASS.
+Gameplay-rule clarity and automated protection gate: FAIL.
+Pre-integration checkpoint: NOT CREATED.
+Playable visual integration: NOT STARTED.
+Required next action: obtain explicit direction on the ambiguous rules and authorization to add missing baseline regression coverage before any production visual integration.
+
+G1-B hardening addendum — 2026-07-20
+Authorization received: gameplay baseline hardening only; no visual integration.
+
+Resolved and characterized findings
+- Score: the original int(abs(speed)*delta*multiplier*0.8) discarded every sub-point frame contribution. G1-B preserves the theoretical |speed|*multiplier*0.8 points/second rate through a fractional carry reset on every new race. Deterministic 11-second simulation at 17.3 m/s: 30 FPS=152, 60 FPS=152, 120 FPS=152, theoretical=152.24.
+- Route length: geometry, checkpoints and finish remain unchanged at 64 segments x 52 m, approximately 3,328 m. The 3,200 m documentation was corrected; unused production constants were not repurposed.
+- Landing/integrity: VehicleController computes landing_impact after move_and_slide() and applies max(0, impact-5)*0.018 only to damage_level, clamped 0..1. The deterministic characterization produced impact=0, damage_level=0 and unchanged GameManager health=100. No behavior was changed.
+- Turbo: existing five-second activation, countdown to zero, no automatic recharge, 1.35 speed ceiling, 1.22 acceleration multiplier and HUD mapping are protected without balance changes.
+- Fuel, integrity, multiplier, timer, penalties, ordered checkpoint thresholds, incomplete/complete finish, restart, record and production HUD bindings now have direct regression coverage.
+- SaveManager defaults, invalid-file fallback, record/settings round trip and record monotonicity are tested through real SaveManager calls with APPDATA redirected to isolated temporary storage. Personal saves are untouched.
+- Production performance now has a real Boot-based MX150 report at res://reports/gameplay_runtime_baseline_before_visual_integration.txt.
+
+New verification results
+- tests/gameplay_score_framerate_verification.gd — PASS.
+- tests/gameplay_resources_verification.gd — PASS.
+- tests/gameplay_hud_binding_verification.gd — PASS.
+- tests/gameplay_save_isolation_verification.gd — PASS.
+- tests/gameplay_runtime_metrics_verification.gd — PASS.
+- Parser/import, Boot headless and all twelve previous regression suites — PASS.
+
+Remaining characterization limits
+- Exact acceleration curves, stopping distances and steering response across the full envelope remain protected indirectly by the existing runtime behavior tests, not golden numeric traces.
+- Gears/RPM remain intentionally display-only simulation; the production HUD binding is now protected, but no drivetrain exists.
+- There is still no unlock/campaign progression system; saved vehicle choice and score record are the only current persistent progression-like data.
+- The historical runtime_verification teardown warning of six leaked ObjectDB instances remains; no functional test failed.
+
+G1-B decision
+Gameplay baseline hardening: PASS.
+Classification: READY FOR PLAYABLE VISUAL INTEGRATION PILOT.
+Visual integration: NOT STARTED.

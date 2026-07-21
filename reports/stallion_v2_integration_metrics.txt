@@ -1,0 +1,9 @@
+Stallion V2 integration metrics
+loading_ms=164.790
+memory_delta_bytes=3384159
+garage_fps=68.67
+special_stage_fps=60.03
+endurance_fps=92.60
+draw_calls=606
+primitives=65580
+objects=786

@@ -1,0 +1,51 @@
+DESERT VELOCITY — FASE G1-I0 RELEASE DIFFICULTY SELECTOR
+Date: 2026-07-21
+Stable input checkpoint: 3c43ba6bfae4fe7dc9e1550d295241181d20874b
+Input checkpoint message: checkpoint final audiovisual release polish
+
+SCOPE
+- Added a non-persistent difficulty selector to the Prova Speciale garage only.
+- Default and main-menu reset: NORMALE.
+- Race restart preserves the selected level in the active GameManager instance.
+- No route, physics, vehicle, collision, obstacle, checkpoint trigger, audio, visual-effect, camera, save schema, progression, or stage-length changes.
+- Endurance has no selector, no difficulty HUD line, and no Stage timer behavior.
+
+CONFIGURATION VERIFIED
+- FACILE: initial_time=105.0s; CP1=+18s; CP2=+18s; CP3=+18s; CP4=+18s; CP5=+18s; CP6=+0s.
+- NORMALE: initial_time=90.0s; CP1=+15s; CP2=+15s; CP3=+15s; CP4=+15s; CP5=+15s; CP6=+0s.
+- DIFFICILE: initial_time=75.0s; CP1=+12s; CP2=+12s; CP3=+12s; CP4=+12s; CP5=+12s; CP6=+0s.
+- All three configurations passed with Desert Stallion 65 and Bavarian GT-R.
+
+INPUT AND UI
+- Mouse: previous/next difficulty buttons PASS.
+- Keyboard: Left/Right difficulty navigation PASS; A/D vehicle navigation remains available.
+- Stage garage layout at 1280x720: PASS after visual inspection; no overlap with vehicle details, vehicle buttons, car preview, start, or menu controls.
+- HUD top-right lines DIFFICOLTÀ FACILE / NORMALE / DIFFICILE: PASS; no new panel and no empty panel.
+
+AUTOMATED VALIDATION
+- git diff --check: PASS.
+- Godot 4.7.1 import/parser, GL Compatibility: PASS.
+- Boot headless: PASS.
+- release_difficulty_selector_verification.gd: PASS, 173 checks.
+  Covers initial timer, decrement, CP1-CP5 exact bonus, CP6 no bonus, pause, restart preservation, timeout, finish, main-menu reset, both vehicles, Endurance isolation, audio start, HUD content, and selector mouse/keyboard input.
+- gameplay_hud_binding_verification.gd: PASS.
+- final_gameplay_consistency_repair_verification.gd: PASS, 98 dedicated checks.
+- final_audiovisual_release_polish_verification.gd: PASS, 124 dedicated checks; both audio profiles and surface dust hierarchy unchanged.
+- Test APPDATA was isolated under .godot for the final validation runs.
+
+SCREENSHOTS
+- screenshots/release_difficulty/01_menu_difficulty_facile.png — 1280x720 PASS.
+- screenshots/release_difficulty/02_menu_difficulty_normale.png — 1280x720 PASS.
+- screenshots/release_difficulty/03_menu_difficulty_difficile.png — 1280x720 PASS.
+- screenshots/release_difficulty/04_hud_difficulty_facile.png — 1280x720 PASS.
+- screenshots/release_difficulty/05_hud_difficulty_normale.png — 1280x720 PASS.
+- screenshots/release_difficulty/06_hud_difficulty_difficile.png — 1280x720 PASS.
+- All six images are direct game-render captures on NVIDIA GeForce MX150 and were visually inspected.
+
+WARNINGS
+- The dedicated/capture harness can report 6-8 ObjectDB instances during process teardown after repeated Boot construction. No runtime failure, parser error, empty HUD panel, or retained gameplay state was observed; established G1-H regression suites exit cleanly.
+- The first headless screenshot attempt waited on RenderingServer.frame_post_draw and was stopped without producing PNG files. Final screenshots were regenerated successfully with the real Windows GL renderer.
+- Pre-existing modified reports/premium_vertical_slice_v2_metrics.txt and 15 untracked camera/recovery diagnostics remain outside this phase and must not be staged.
+
+CLASSIFICATION
+A) RELEASE DIFFICULTY SELECTOR PASS

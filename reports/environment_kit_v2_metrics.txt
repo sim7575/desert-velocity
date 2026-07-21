@@ -1,0 +1,26 @@
+Environment Kit V2 visual polish metrics
+duration_seconds=12.00
+average_fps=59.92
+instantaneous_minimum_fps=42.65
+percentile_5_fps=60.00
+minimum_sustained_fps=58.34
+load_time_ms=464.64
+peak_draw_calls=171
+peak_primitives=177234
+peak_nodes=245
+peak_static_memory_mb=41.91
+assets=40
+materials_shared=9
+textures=12
+lod0_triangles=26982
+lod1_triangles=16495
+lod2_triangles=9346
+renderer=GL Compatibility
+gpu=NVIDIA GeForce MX150
+resolution=1280x720
+lighting_presets=Daylight Neutral|Golden Hour|Sunset Cinematic
+primary_preset=Golden Hour
+shader=environment_v2_polish.gdshader
+polish_screenshots=14
+classification=AWAITING_MANUAL_VISUAL_APPROVAL
+production_integrated=false

@@ -1,0 +1,15 @@
+Desert Velocity — G1-H FINAL AUDIOVISUAL RELEASE POLISH BASELINE
+date=2026-07-21
+branch=master
+required_checkpoint=0349621792bec9ca9a41da155b93a6eb819cfa8c
+head_at_start=0349621792bec9ca9a41da155b93a6eb819cfa8c
+checkpoint_message=checkpoint final gameplay consistency repair
+checkpoint_match=true
+staged_changes_at_start=0
+tracked_change_preexisting=reports/premium_vertical_slice_v2_metrics.txt
+tracked_change_scope=runtime metric values only; preserved, never restored, never staged
+protected_untracked_camera_recovery_files=15
+git_diff_check_initial=PASS (line-ending warnings only)
+git_fsck_full_no_dangling=PASS
+production_files_modified_before_phase=0
+policy=selective staging; preexisting tracked/untracked files excluded

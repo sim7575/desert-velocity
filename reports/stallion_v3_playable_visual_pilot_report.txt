@@ -1,0 +1,59 @@
+Desert Velocity - G1-C Stallion V3 playable visual pilot
+Date: 2026-07-20
+Entry checkpoint: ab41952ce94bd845653ca283f9b5a0e943f09f0b
+
+Scope
+- Real production flow: Boot.tscn, Prova Speciale, VehicleController.setup(0), VehicleFactory.
+- Runtime default: Desert Stallion V3 Rally Sand, LOD0.
+- Explicit reversible flag: VehicleFactory.use_stallion_v3_visual_pilot=true.
+- Fallback: existing Desert Stallion V2 factory path; procedural fallback remains after V2.
+- No gameplay, physics, controller, collision, route, checkpoint, HUD, save or balance changes.
+
+Runtime visual identity
+- Scene: res://scenes/visual/production/StallionV3PlayableVisual.tscn
+- Approved visual base: res://scenes/visual/assets/DesertStallionV3Visual.tscn
+- GLB: res://assets/models/vehicles/desert_stallion_v3.glb
+- Variant: rally_sand
+- LOD: LOD0 only; unused LOD1/LOD2 are not instantiated in production.
+- Scale: (1,1,1)
+- Model offset: (0,0.04,0)
+- Meshes: 14
+- Reconstructed material categories: 7
+- Triangles: 54,268
+- Wheel nodes: Wheel_FL, Wheel_FR, Wheel_RL, Wheel_RR
+- Runtime wheel centers: FL(-0.88,0.47,-1.41), FR(0.88,0.47,-1.41), RL(-0.88,0.47,1.41), RR(0.88,0.47,1.41)
+- Wheel animation uses the existing four-pivot controller capability marker; controller code is unchanged.
+
+Functional verification
+- V3 default factory selection: PASS.
+- V3 wrapper and LOD0 load: PASS.
+- V2 explicit fallback and source path: PASS.
+- Acceleration, braking, steering and wheel animation: PASS through production/runtime regression.
+- Simulated gear/RPM and production HUD binding: PASS.
+- Fuel, integrity, turbo, multiplier, checkpoint, finish, restart and reset protection: PASS.
+- Personal saves: untouched; test APPDATA isolated.
+- Stallion V2 historical integration test: PASS with temporary V3 flag disable and restoration.
+- GT V2 gameplay integration test: PASS with temporary V3 flag disable and restoration for its Stallion cross-check.
+- Parser/import and 17 regression suites: PASS.
+
+Visual review
+- stallion_v3_runtime_rear.png: PASS; rear, roll cage, fenders, wheels, livery and HUD readable.
+- stallion_v3_runtime_side.png: PASS; silhouette, ride height and both side wheel centers readable.
+- stallion_v3_runtime_front_threequarter.png: PASS; front fascia, fenders, wheel geometry, cage and Rally Sand material readable.
+- stallion_v3_wheel_alignment.png: PASS; close side view shows wheel placement without visible suspension/pivot clipping.
+- stallion_v2_v3_runtime_comparison.png: PASS; V3 Rally Sand and V2 fallback shown together in real Boot stage with HUD.
+- No Premium Vertical Slice V2 screenshot was used.
+
+Performance
+- See res://reports/stallion_v3_playable_visual_pilot_metrics.txt.
+- MX150, GL Compatibility, 1280x720, 15-second real driving sample.
+- Average 60.28 FPS; P5 56.30; sustained minimum 58.88; instantaneous minimum 27.43.
+- No recurring stutter; one isolated frame over the stutter threshold.
+- 842 peak draw calls; 148,892 peak primitives; 852 nodes; 52.13 MB static memory.
+- Load 694.81 ms, +326.16 ms from V2 baseline and below the explicit 868.65 ms controlled gate.
+- Performance gate: PASS.
+
+Decision
+Technical and regression result: PASS.
+Classification: AWAITING MANUAL PLAYABLE VEHICLE APPROVAL.
+No additional graphical integration started.

@@ -1,0 +1,60 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/vehicles/desert_stallion_65_v2.glb" id="1"]
+[ext_resource type="PackedScene" path="res://assets/models/environment/desert_prototype_environment_v2.glb" id="2"]
+[ext_resource type="Script" path="res://scenes/visual/visual_prototype_v2.gd" id="3"]
+[sub_resource type="ProceduralSkyMaterial" id="NeutralSkyMaterial"]
+sky_top_color = Color(0.30, 0.42, 0.58, 1)
+sky_horizon_color = Color(0.72, 0.76, 0.80, 1)
+ground_bottom_color = Color(0.16, 0.17, 0.18, 1)
+ground_horizon_color = Color(0.46, 0.47, 0.48, 1)
+sun_angle_max = 14.0
+[sub_resource type="Sky" id="NeutralSky"]
+sky_material = SubResource("NeutralSkyMaterial")
+[sub_resource type="Environment" id="NeutralEnvironment"]
+background_mode = 2
+sky = SubResource("NeutralSky")
+background_energy_multiplier = 0.72
+ambient_light_source = 3
+ambient_light_color = Color(0.56, 0.61, 0.68, 1)
+ambient_light_energy = 0.58
+reflected_light_source = 2
+tonemap_mode = 2
+fog_enabled = true
+fog_light_color = Color(0.60, 0.64, 0.69, 1)
+fog_light_energy = 0.45
+fog_density = 0.002
+fog_sky_affect = 0.35
+[sub_resource type="StandardMaterial3D" id="BlackSilhouette"]
+shading_mode = 0
+albedo_color = Color(0, 0, 0, 1)
+
+[node name="VisualPrototypeV2" type="Node3D"]
+script = ExtResource("3")
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("NeutralEnvironment")
+[node name="NeutralKey" type="DirectionalLight3D" parent="."]
+rotation_degrees = Vector3(-42, -132, 0)
+light_color = Color(1, 0.95, 0.88, 1)
+light_energy = 1.15
+shadow_enabled = true
+directional_shadow_max_distance = 90.0
+[node name="NeutralFill" type="OmniLight3D" parent="."]
+position = Vector3(5, 4, 6)
+light_color = Color(0.72, 0.82, 1, 1)
+light_energy = 1.45
+omni_range = 15.0
+shadow_enabled = true
+[node name="RearFill" type="OmniLight3D" parent="."]
+position = Vector3(-4, 3, -4)
+light_color = Color(1, 0.78, 0.60, 1)
+light_energy = 0.85
+omni_range = 12.0
+[node name="EnvironmentV2" parent="." instance=ExtResource("2")]
+[node name="DesertStallion65V2" parent="." instance=ExtResource("1")]
+position = Vector3(0, 0.04, -0.5)
+[node name="Camera3D" type="Camera3D" parent="."]
+position = Vector3(5.7, 2.5, 6.8)
+current = true
+fov = 43.0
+

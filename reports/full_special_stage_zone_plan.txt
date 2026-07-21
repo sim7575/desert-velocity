@@ -1,0 +1,63 @@
+Desert Velocity G1-F Full Special Stage Zone Plan
+zone_count=7
+style_source=approved G1-D.1 Environment Kit V2 only
+transition_rule=adjacent zones overlap visually through density and landmark graduation; no biome or time-of-day changes
+
+ZONE 1 | Desert Start / Open Flats | segments 0-9 | 0-520 m | CP1@9
+Identity: approved pilot, open assistance start developing into the first S.
+Palette: warm gray ground, restrained ochre rock.
+Landmark: HeroRock A/B/C sequence and first canyon walls already approved.
+Density: low at 0-2, medium 3-7, reduced around CP1.
+Transition out: dunes and low talus increase on 8-10 while skyline remains open.
+
+ZONE 2 | Eroded Rock Corridor | segments 10-17 | 520-936 m | no checkpoint
+Identity: low eroded walls framing DOSSO and the hairpin.
+Palette: burnt earth and muted red with warm-gray secondary stones.
+Landmark: asymmetric CanyonWall pair outside the hairpin.
+Density: low at jump 12, high outside 14-17, empty apex/sightline.
+Transition out: walls step down and expose the climb toward CP2.
+
+ZONE 3 | Canyon Approach / High Ridge | segments 18-28 | 936-1508 m | CP2@19
+Identity: climb to CRESTA, high ridge, then long asphalt descent.
+Palette: ochre highlights, dark earth fractures, cooler distant mesas.
+Landmark: HeroRock split crown below crest; distant mesa after segment 22.
+Density: sparse at CP2/crest, medium talus on descent exterior.
+Transition out: rock density falls while road wear and open plateau increase.
+
+ZONE 4 | High Plateau Technical | segments 29-39 | 1508-2080 m | CP3@29, CP4@39
+Identity: open ramp and rhythmic technical S on a plateau.
+Palette: gray-warm gravel with controlled ochre accents.
+Landmark: broken butte beyond landing, alternating low rock clusters.
+Density: very low 29-32, alternating medium clusters 34-38, low at CP4.
+Transition out: gravel debris thins and asphalt shoulder wear appears gradually.
+
+ZONE 5 | Technical Asphalt Pass | segments 40-47 | 2080-2496 m | no checkpoint
+Identity: tightening asphalt descent between discontinuous stepped walls.
+Palette: dark weathered road, earth walls, muted red secondary rock.
+Landmark: CanyonWall stepped composition on curve exterior.
+Density: medium exterior, sparse interior; never a continuous corridor.
+Transition out: walls open, sand intrusion and gravel return before CP5.
+
+ZONE 6 | Dunes and Wreck Section | segments 48-56 | 2496-2964 m | CP5@49
+Identity: open gravel recovery among low dunes and a restrained survey-wreck narrative.
+Palette: desaturated sand, warm gray gravel, oxidized metal accent.
+Landmark: NarrativeWreck and dune triplet outside the driving corridor.
+Density: low at CP5, medium clustered props 51-55, declining at 56.
+RockArch: candidate only at 50-54; include solely after clearance and camera verification, otherwise use paired canyon fins as reasoned alternative.
+Transition out: props disappear, mesas and finish sightline take over.
+
+ZONE 7 | Final Golden Run | segments 57-63 | 2964-3328 m | CP6@59, finish@63
+Identity: fast open golden run with escalating but unobstructed finish framing.
+Palette: approved golden-hour ochre/sand with cool distant mesa contrast.
+Landmark: distant mesa pair, sparse final hero rocks and finish portal.
+Density: low throughout; small clusters at lateral distance only.
+Transition: CP6 and finish use the approved portal language; central vista remains empty.
+
+Global LOD plan: hero landmarks LOD0 only at key vistas; canyon/medium rocks/props LOD1; small rocks, talus, gravel and vegetation LOD2 MultiMesh.
+Global visibility plan: distance ranges with margins; full route geometry persistent, small scatter distance-culled. No asynchronous loading and no gameplay-driven streaming.
+Fallback plan: new local RoadManager flag selects full-stage wrapper; disabling it returns the approved 0-9 pilot, and disabling the existing pilot returns the original scenario.
+Checkpoint plan: preserve triggers/colliders/order; add collision-free CP02-CP06 visual portals and pulse only their visual nodes from observed stage_checkpoint.
+Road plan: combine extension geometry per zone/category to avoid six draw calls per segment; retain exact stage_layout transforms.
+Terrain plan: combined per-zone terrain plus a MultiMesh underlay, no collision objects.
+Performance budget: below 950 draw calls and 500000 primitives, P5/minimum sustained >=55, no recurring stutter.
+plan_classification=PASS

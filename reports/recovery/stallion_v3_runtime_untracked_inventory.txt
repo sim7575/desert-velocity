@@ -1,0 +1,29 @@
+head=971a05f5d391d4436676622336dbd7dacb61201e
+previous_checkpoint=28814e59fc4e4e3a261430a6555dbcffc7bf94c8
+captured_date=2026-07-20
+
+[working_tree]
+ M scenes/visual/asset_review/desert_stallion_v3_visual.gd
+ M scenes/visual/production/stallion_v3_playable_visual.gd
+ M tests/stallion_v3_playable_visual_pilot_verification.gd
+?? reports/playable_camera_v3_runtime_optimization_metrics.txt
+?? reports/recovery/playable_camera_v3_partial_diff.patch
+?? reports/recovery/playable_camera_v3_untracked_inventory.txt
+?? screenshots/playable_camera_v3_optimization/camera_after_curve.png
+?? screenshots/playable_camera_v3_optimization/camera_after_high_speed.png
+?? screenshots/playable_camera_v3_optimization/camera_after_straight.png
+?? screenshots/playable_camera_v3_optimization/camera_before.png
+?? screenshots/playable_camera_v3_optimization/camera_variant_farther.png
+?? screenshots/playable_camera_v3_optimization/camera_variant_lower.png
+?? screenshots/playable_camera_v3_optimization/lod0_lod1_runtime_comparison.png
+?? screenshots/playable_camera_v3_optimization/vehicle_screen_occupancy_measurement.png
+?? tests/playable_camera_v3_baseline_capture.gd.uid
+?? tests/playable_camera_v3_optimization_runtime_verification.gd
+?? tests/playable_camera_v3_optimization_runtime_verification.gd.uid
+
+[sha256]
+A8745452C87400EF155311E91A9A94E9F97F2AAC542C882B9E2943ACF43D2B47  scenes/visual/asset_review/desert_stallion_v3_visual.gd
+7A3B4E63BD06EBAE1B9BF5203DCC71B906812E71BF05F9EEFE34741836EF833A  scenes/visual/production/stallion_v3_playable_visual.gd
+D2E33F40FED445243B0F8064DBBC95DA6FD7FA9F1254EC4D929E77A69A3F38D3  tests/stallion_v3_playable_visual_pilot_verification.gd
+47AA3E674FF1682EF87F23AAF8A567A689EB57D4C2FD0FA4505E487E4618DB7D  reports/playable_camera_v3_runtime_optimization_metrics.txt
+9B7A1DB8B9602D1F5DC0F178F039F7C78EAD72FE13F2FB93C1420F28A21F4138  tests/playable_camera_v3_optimization_runtime_verification.gd

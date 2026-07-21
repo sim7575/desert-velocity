@@ -1,0 +1,221 @@
+Desert Velocity — FASE G1-H FINAL GAMEPLAY CONSISTENCY REPAIR
+date=2026-07-21
+classification=A) FINAL GAMEPLAY CONSISTENCY PASS
+
+CHECKPOINT E BASELINE
+checkpoint_initial=a30ff57fdac74c29da7f703141552483211bcafe
+checkpoint_message=checkpoint garage scenario parity and route dynamics repair
+branch=master
+head_at_start=a30ff57fdac74c29da7f703141552483211bcafe
+head_descends_from_checkpoint=true
+tracked_changes_at_start=0
+staged_changes_at_start=0
+protected_untracked_diagnostics=15
+git_diff_check_initial=PASS
+git_fsck_full_no_dangling=PASS
+baseline_inventory=reports/final_gameplay_consistency_repair_baseline.txt
+
+ENDURANCE — DIAGNOSI
+La scena Boot usa un solo GameManager e un solo RoadManager per entrambe le modalità.
+Il vecchio scenario non proveniva dalla factory delle vetture né da un RoadManager separato.
+La causa era in scripts/road_manager.gd: il visuale Environment V2/full-stage veniva istanziato
+soltanto quando stage_mode=true. In scripts/game_manager.gd Endurance non assegnava alcun
+profilo visuale, quindi rimanevano visibili le mesh procedurali storiche dei segmenti riciclati.
+
+ENDURANCE — CORREZIONE
+GameManager assegna a Endurance EnduranceG1F1VisualAdapter.tscn quando i flag approvati
+Environment V2 + full-stage sono attivi. L'adapter riusa mesh, materiali, texture e LOD del
+kit approvato G1-F.1 sui segmenti Endurance riciclati, senza aggiungere collisioni e senza
+sostituire regole, punteggio, moltiplicatore, carburante, integrità, bonus, ostacoli, spawn,
+respawn, salvataggi o selezione vettura. Il visuale storico resta disponibile come fallback
+tecnico quando i flag vengono disattivati.
+scenario_identifier_endurance_stallion=G1-F.1_FULL_STAGE
+scenario_identifier_endurance_bavarian=G1-F.1_FULL_STAGE
+scenario_identifier_stage_stallion=G1-F.1_FULL_STAGE
+scenario_identifier_stage_bavarian=G1-F.1_FULL_STAGE
+normal_launch_historical_scenario=false
+visual_collision_count=0
+
+AUDIO — DIAGNOSI PRECISA
+node_responsible=SFX (AudioStreamPlayer creato da scripts/audio_manager.gd)
+event_responsible=AudioManager.update_engine
+streams_responsible=145Hz/0.07s gravel; 96Hz/0.10s offroad; 185Hz/0.08s drift
+root_cause=update_engine viene chiamato ogni frame e, appena il breve stream SFX terminava,
+lo riavviava. Su GRAVEL questo produceva il tic periodico continuo.
+
+AUDIO — CORREZIONE
+Le texture continue di superficie sono state spostate su SurfaceLoop, un AudioStreamPlayer
+dedicato con stream PCM looped e volume/pitch continui. SFX resta riservato agli eventi brevi.
+Motore, musica, turbo, collisioni, checkpoint, start e finish restano attivi.
+audio_players_total=4
+audio_players_active_during_stage=3
+stable_gravel_update_calls=360
+short_events_added_during_stable_gravel=0
+startup_short_events=1
+startup_event=520Hz/0.22s
+maximum_simultaneous_short_streams=1
+duplicate_nodes_after_restart=false
+surface_loop_mode=loop_forward
+continuous_tick_detected=false
+
+TIMER PROVA SPECIALE
+preexisting_logic=esistevano countdown iniziale di 4 s e stage_time crescente per risultati;
+non esistevano tempo residuo, bonus checkpoint o condizione a zero.
+implementation=un solo nuovo stage_time_remaining; stage_time storico conservato per risultati.
+initial_time_seconds=90
+checkpoint_bonus_seconds=20
+bonus_checkpoints=CP1-CP5
+finish_checkpoint_bonus=0
+bonus_repeat_same_checkpoint=false
+timer_starts_after_initial_countdown=true
+timer_freezes_in_pause=true
+timer_resumes=true
+timer_resets_on_restart=true
+sample_before_cp1_seconds=80.00
+sample_after_cp1_seconds=99.99
+hud_start=TEMPO 01:30
+hud_bonus=+20s per circa 1 secondo
+zero_behavior=TEMPO SCADUTO; controlli disabilitati; RIPROVA e MENU disponibili
+elapsed_stage_timer_preserved=true
+
+COME SI GIOCA
+Conservati ostacoli, colori bonus, R e F3. Aggiunte sezioni CONTROLLI, PROVA SPECIALE ed
+ENDURANCE. Il turbo è descritto secondo l'Input Map reale: bonus azzurro con attivazione
+automatica; nessun tasto inventato. Layout verificato integro a 1280x720.
+
+ATTERRAGGIO
+strategy=assestamento esclusivamente sul visual body separato dal CharacterBody3D/collider
+compression_duration_seconds=0.09
+rebound_duration_seconds=0.10
+settle_duration_seconds=0.15
+total_duration_seconds=0.34
+rebound_ratio=0.32
+cycles=1
+camera_transform_affected=false
+collider_transform_affected=false
+trajectory_affected=false
+gameplay_damage_affected=false
+stallion_visual_impact_mps=7.8333
+stallion_peak_compression_m=0.0933
+stallion_captured_compression_m=-0.09128
+stallion_captured_rebound_m=0.01139
+stallion_gameplay_impact=0.0
+stallion_damage_level=0.0
+bavarian_visual_impact_mps=9.0000
+bavarian_peak_compression_m=0.1000
+bavarian_captured_compression_m=-0.09780
+bavarian_captured_rebound_m=0.01220
+bavarian_gameplay_impact=0.0
+bavarian_damage_level=0.0
+persistent_second_bounce=false
+
+TEST DEDICATO
+test=tests/final_gameplay_consistency_repair_verification.gd
+dedicated_checks_executed=98
+dedicated_checks_required_minimum=30
+result=PASS
+Coverage: quattro combinazioni modalità/vettura, esclusione scenario storico, motore,
+assenza retrigger breve/tic, inventario audio e restart, timer decremento/pausa/ripresa,
+bonus singolo, reset, timeout, HUD, gara completa, checkpoint/traguardo, atterraggio per
+entrambe le vetture, assenza rimbalzo persistente, Garage e bonus Endurance.
+
+SUITE REGRESSIVE
+parser_import=PASS
+runtime_verification=PASS on immediate isolated rerun
+gameplay_resources_verification=PASS
+gameplay_hud_binding_verification=PASS
+gameplay_visual_effects_hud_pilot_verification=PASS (40/40)
+road_seam_verification=PASS (144 crossings)
+gt_v2_gameplay_integration_verification=PASS
+garage_scenario_route_dynamics_jump_measure=PASS
+gameplay_save_isolation_verification=PASS in isolated APPDATA
+capture_verification=PASS
+metrics_verification=PASS
+
+METRICHE MX150 — 1280x720 GL COMPATIBILITY, WARM
+sample_frames=840
+average_fps=60.41
+p5_fps=58.36
+minimum_sustained_fps=59.07
+frame_time_p95_ms=17.136
+frame_time_p99_ms=17.619
+recurring_stutter=false
+peak_draw_calls=209
+peak_primitives=142634
+peak_nodes=1169
+peak_static_memory_mb=65.49
+warm_load_ms=1362.29
+performance_gate=PASS
+
+SCREENSHOT
+directory=screenshots/playable_visual_integration_pilot/g1h
+count=16
+resolution=1280x720
+invalid_dimensions=0
+visual_inspection=PASS
+files:
+01_endurance_stallion_new_environment.png
+02_endurance_bavarian_new_environment.png
+03_special_stage_stallion.png
+04_special_stage_bavarian.png
+05_how_to_play_updated.png
+06_timer_start.png
+07_timer_running.png
+08_checkpoint_before_bonus.png
+09_checkpoint_bonus_plus_time.png
+10_timer_after_bonus.png
+11_landing_stallion_contact.png
+12_landing_stallion_rebound.png
+13_landing_bavarian_contact.png
+14_landing_bavarian_rebound.png
+15_pause_timer_frozen.png
+16_restart_timer_reset.png
+
+WARNING
+La prima esecuzione di runtime_verification ha fallito l'accelerazione Stallion dopo un
+recupero precoce casuale (14.18 m/s); la riesecuzione isolata immediata ha raggiunto 48.0 m/s
+ed è PASS. Nessun file di produzione G1-H interviene su accelerazione, grip o recupero.
+Il warning è classificato come flakiness storica del test, non regressione riproducibile.
+La revisione visiva/manuale di Endurance, audio reale e feeling dell'assestamento resta richiesta.
+
+FILE MODIFICATI G1-H
+PROGRESS.md
+scenes/production_visual_pilot/full_stage/full_special_stage_visual_expansion.gd
+scripts/audio_manager.gd
+scripts/game_manager.gd
+scripts/hud.gd
+scripts/road_manager.gd
+scripts/vehicle_controller.gd
+tests/gameplay_hud_binding_verification.gd
+tests/gameplay_visual_effects_hud_pilot_verification.gd
+
+FILE CREATI G1-H
+reports/final_gameplay_consistency_repair_baseline.txt
+reports/final_gameplay_consistency_repair_report.txt
+scenes/production_visual_pilot/full_stage/EnduranceG1F1VisualAdapter.tscn
+scenes/production_visual_pilot/full_stage/endurance_g1f1_visual_adapter.gd
+scenes/production_visual_pilot/full_stage/endurance_g1f1_visual_adapter.gd.uid
+tests/final_gameplay_consistency_repair_verification.gd
+tests/final_gameplay_consistency_repair_verification.gd.uid
+screenshots/playable_visual_integration_pilot/g1h/*.png (16)
+
+FILE ESCLUSI DAL CHECKPOINT
+reports/playable_camera_v3_runtime_optimization_metrics.txt
+reports/recovery/playable_camera_v3_partial_diff.patch
+reports/recovery/playable_camera_v3_untracked_inventory.txt
+reports/recovery/stallion_v3_runtime_partial_diff.patch
+screenshots/playable_camera_v3_optimization/*.png (8)
+tests/playable_camera_v3_baseline_capture.gd.uid
+tests/playable_camera_v3_optimization_runtime_verification.gd
+tests/playable_camera_v3_optimization_runtime_verification.gd.uid
+Nessun .png.import, export, ZIP, Release Candidate o file personale incluso.
+
+STATO GIT FINALE PRE-CHECKPOINT
+tracked_scope=solo file G1-H elencati
+staged_scope=da verificare selettivamente prima del commit
+protected_untracked_diagnostics=preservati
+planned_commit_message=checkpoint final gameplay consistency repair
+push=not_performed
+
+FINAL_CLASSIFICATION=A) FINAL GAMEPLAY CONSISTENCY PASS
+NEXT_STATE=AWAITING MANUAL FINAL GAMEPLAY APPROVAL

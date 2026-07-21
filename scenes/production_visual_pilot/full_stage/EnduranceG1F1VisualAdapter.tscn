@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource path="res://scenes/production_visual_pilot/full_stage/endurance_g1f1_visual_adapter.gd" type="Script" id="1"]
+
+[node name="EnduranceG1F1VisualAdapter" type="Node3D"]
+script = ExtResource("1")
